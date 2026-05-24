@@ -1,0 +1,101 @@
+@import "tailwindcss";
+
+@theme {
+  --color-background-obsidian: #030712;
+  --color-surface-card: #0B1117;
+  --color-accent-cyan: #38BDF8;
+  --color-accent-indigo: #818CF8;
+  --color-border-dark: #1F2937;
+  
+  --font-sans: "Inter", "Geist Sans", system-ui, -apple-system, sans-serif;
+  --font-display: "Outfit", "Geist Sans", sans-serif;
+}
+
+:root {
+  --background: #030712;
+  --foreground: #F3F4F6;
+  --card: #0B1117;
+  --border: #1F2937;
+  --accent-cyan: #38BDF8;
+  --accent-indigo: #818CF8;
+}
+
+body {
+  background-color: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-sans);
+  letter-spacing: -0.015em;
+  overflow-x: hidden;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #030712;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #1F2937;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #38BDF8;
+}
+
+/* Glassmorphism utility */
+.glass-panel {
+  background: rgba(11, 17, 23, 0.7);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(31, 41, 55, 0.6);
+}
+
+.glass-panel-glow {
+  background: rgba(11, 17, 23, 0.85);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(56, 189, 248, 0.3);
+  box-shadow: 0 0 10px 0px rgba(56, 189, 248, 0.15);
+}
+
+/* Custom interactive element glow */
+.interactive-glow:focus,
+.interactive-glow:active,
+.interactive-glow.active {
+  outline: none;
+  border-color: #38BDF8;
+  box-shadow: 0 0 8px 0px rgba(56, 189, 248, 0.5);
+  transition: all 0.2s ease-in-out;
+}
+
+.hover-glow:hover {
+  border-color: rgba(56, 189, 248, 0.5);
+  box-shadow: 0 0 6px 0px rgba(56, 189, 248, 0.2);
+  transition: all 0.2s ease-in-out;
+}
+
+/* Custom utility animations */
+@keyframes pulseGlow {
+  0%, 100% {
+    box-shadow: 0 0 8px 0px rgba(56, 189, 248, 0.15);
+  }
+  50% {
+    box-shadow: 0 0 16px 2px rgba(56, 189, 248, 0.3);
+  }
+}
+
+.pulse-glow {
+  animation: pulseGlow 4s infinite ease-in-out;
+}
+
+/* ECharts responsive helper */
+.chart-container {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
