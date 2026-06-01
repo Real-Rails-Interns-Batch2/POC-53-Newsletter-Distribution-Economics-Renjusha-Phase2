@@ -81,3 +81,21 @@ def export_data(
         response = Response(content=json_data, media_type="application/json")
         response.headers["Content-Disposition"] = "attachment; filename=subscriber_economics_export.json"
         return response
+        
+@router.get("/export/metrics")
+def export_metrics(
+    category: str = "All",
+    source: str = "All",
+    cohort_period: str = "All",
+    revenue_range: str = "All",
+    referral_segment: str = "All",
+    open_rate_threshold: float = None
+):
+    return analytics_service.export_dashboard_metrics(
+        category,
+        source,
+        cohort_period,
+        revenue_range,
+        referral_segment,
+        open_rate_threshold
+    )

@@ -43,3 +43,25 @@ export function getExportUrl(filters: Filters, format: 'csv' | 'json'): string {
   const qs = buildQueryString(filters);
   return `${API_BASE_URL}/export?${qs}&format=${format}`;
 }
+
+export async function exportMetrics(
+  filters: Filters
+) {
+  const params = new URLSearchParams();
+
+  Object.entries(filters).forEach(([k, v]) => {
+    if (v !== null) {
+      params.append(k, String(v));
+    }
+  });
+
+  const res = await fetch(
+    `${API_BASE_URL}/export/metrics?${params}`
+  );
+
+  if (!res.ok) {
+    throw new Error('Failed export');
+  }
+
+  return await res.json();
+}

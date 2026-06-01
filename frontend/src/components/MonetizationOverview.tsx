@@ -37,6 +37,20 @@ export default function MonetizationOverview({ data }: MonetizationOverviewProps
     const sponRev = data.history.map(item => item.sponsorship_revenue);
     const premRev = data.history.map(item => item.premium_subscription_revenue);
     const revPerSub = data.history.map(item => item.revenue_per_subscriber);
+    
+    const actualRevenue = data.history.map(
+      (item) => item.total_revenue
+    );
+
+     const forecastMonths =
+       data.forecast?.map(
+       (item) => item.month
+       ) || [];
+
+     const forecastRevenue =
+       data.forecast?.map(
+         (item) => item.projected_revenue
+       ) || [];
 
     const option: echarts.EChartsOption = {
       tooltip: {

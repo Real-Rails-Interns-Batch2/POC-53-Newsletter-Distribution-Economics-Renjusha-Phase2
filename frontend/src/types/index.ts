@@ -58,6 +58,10 @@ export interface MonetizationResponse {
   sponsorship_yield_insight: string;
   premium_growth_insight: string;
   overall_rev_insight: string;
+  forecast: {
+     month: string;
+     projected_revenue: number;
+  }[];
 }
 
 export interface FunnelStage {

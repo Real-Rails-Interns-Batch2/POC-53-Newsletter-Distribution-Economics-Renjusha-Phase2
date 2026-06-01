@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useCallback } from 'react';
 import { Filters, DashboardPayload, SubscriberListResponse } from '../types';
-import { fetchDashboardData, fetchSubscribersList } from '../lib/api';
+import { exportMetrics, fetchDashboardData, fetchSubscribersList } from '../lib/api';
 import Sidebar from '../components/Sidebar';
 import CohortDashboard from '../components/CohortDashboard';
 import ReferralFlow from '../components/ReferralFlow';
@@ -10,6 +10,7 @@ import MonetizationOverview from '../components/MonetizationOverview';
 import FunnelAnalytics from '../components/FunnelAnalytics';
 import BenchmarkComparison from '../components/BenchmarkComparison';
 import SubscriberTable from '../components/SubscriberTable';
+import { Download } from 'lucide-react';
 import { 
   Terminal, 
   Layers, 
@@ -157,6 +158,7 @@ export default function Dashboard() {
           { month: "2026-04", sponsorship_revenue: 19500, premium_subscription_revenue: 6200, total_revenue: 25700, active_sponsors: 13, avg_cpm: 51.0, revenue_per_subscriber: 4.15 },
           { month: "2026-05", sponsorship_revenue: 22000, premium_subscription_revenue: 7100, total_revenue: 29100, active_sponsors: 14, avg_cpm: 53.5, revenue_per_subscriber: 4.35 }
         ],
+        forecast: [],
         sponsorship_yield_insight: "Sponsorship yield outperforms local targets by 18% in the fallback simulation.",
         premium_growth_insight: "Premium subscriptions show consistent MoM recurring baseline stability.",
         overall_rev_insight: "Monthly distribution revenues have compounded organically at 12% MoM."
@@ -232,23 +234,66 @@ export default function Dashboard() {
           </div>
         </div>
 
-        {/* Status indicator */}
-        <div className="flex items-center gap-4">
-          <div className="flex items-center gap-1.5 px-3 py-1 rounded bg-background-obsidian border border-border-dark text-[10px] font-mono">
-            {isBackendConnected ? (
-              <>
-                <Wifi className="h-3.5 w-3.5 text-accent-cyan" />
-                <span className="text-accent-cyan font-bold uppercase">UVICORN CONNECTED</span>
-              </>
-            ) : (
-              <>
-                <WifiOff className="h-3.5 w-3.5 text-orange-400 animate-pulse" />
-                <span className="text-orange-400 font-bold uppercase">OFFLINE FAILOVER</span>
-              </>
-            )}
-          </div>
-        </div>
-      </header>
+        {/* Status indicator + Export */}
+<div className="flex items-center gap-4">
+
+  {/* Export Metrics Button */}
+  <button
+    onClick={async () => {
+      try {
+        const data = await exportMetrics(filters);
+
+        const blob = new Blob(
+          [JSON.stringify(data, null, 2)],
+          { type: 'application/json' }
+        );
+
+        const url =
+          window.URL.createObjectURL(blob);
+
+        const a =
+          document.createElement('a');
+
+        a.href = url;
+        a.download =
+          'newsletter_metrics.json';
+
+        a.click();
+
+        window.URL.revokeObjectURL(url);
+      } catch (error) {
+        console.error(
+          'Failed to export metrics',
+          error
+        );
+      }
+    }}
+    className="px-4 py-2 rounded border border-accent-cyan/25 bg-accent-cyan/10 text-accent-cyan text-xs font-mono hover:bg-accent-cyan/20 transition"
+  >
+    EXPORT METRICS
+  </button>
+
+  {/* Backend Status */}
+  <div className="flex items-center gap-1.5 px-3 py-1 rounded bg-background-obsidian border border-border-dark text-[10px] font-mono">
+    {isBackendConnected ? (
+      <>
+        <Wifi className="h-3.5 w-3.5 text-accent-cyan" />
+        <span className="text-accent-cyan font-bold uppercase">
+          UVICORN CONNECTED
+        </span>
+      </>
+    ) : (
+      <>
+        <WifiOff className="h-3.5 w-3.5 text-orange-400 animate-pulse" />
+        <span className="text-orange-400 font-bold uppercase">
+          OFFLINE FAILOVER
+        </span>
+      </>
+    )}
+  </div>
+</div>
+</header>
+      
 
       {/* Failover Alert Banner */}
       {!isBackendConnected && errorMsg && (
@@ -375,7 +420,7 @@ export default function Dashboard() {
         </div>
 
         {/* RIGHT SIDEBAR (30% width = 3 columns) */}
-        <div className="lg:col-span-3">
+        <div className="lg:col-span-3 self-start sticky top-24 h-fit">
           <Sidebar 
             metrics={dashboardData ? dashboardData.metrics : null}
             filters={filters}

@@ -64,18 +64,23 @@ class AnalyticsService:
         # Apply revenue range filter (e.g., "$0-$10", "$10-$50", "$50+") if provided
         # This applies to individual subscriber premium subscription revenue
         if revenue_range and revenue_range != 'All':
-            sub_clauses = [sub_where] if sub_where else []
+            revenue_clause = ""
+
             if revenue_range == "$0":
-                sub_clauses.append("premium_subscription_revenue = 0")
+                revenue_clause = "premium_subscription_revenue = 0"
             elif revenue_range == "$1-$50":
-                sub_clauses.append("premium_subscription_revenue > 0 AND premium_subscription_revenue <= 50")
+                revenue_clause = (
+                   "premium_subscription_revenue > 0 "
+                   "AND premium_subscription_revenue <= 50"
+              )
             elif revenue_range == "$50+":
-                sub_clauses.append("premium_subscription_revenue > 50")
-            
-            if sub_where:
-                sub_where = "WHERE " + " AND ".join(sub_clauses[0].replace("WHERE ", "") + [sub_clauses[1]])
-            else:
-                sub_where = "WHERE " + " AND ".join(sub_clauses)
+                revenue_clause = "premium_subscription_revenue > 50"
+
+            if revenue_clause:
+               if sub_where:
+                   sub_where += f" AND {revenue_clause}"
+               else:
+                   sub_where = f"WHERE {revenue_clause}"
 
         # Get subscribers
         sub_query = f"SELECT * FROM subscribers {sub_where}"
@@ -305,18 +310,41 @@ class AnalyticsService:
         # Let's count how many subscribers are in df_subs
         total_subs = len(df_subs)
         if total_subs > 0:
-            # average referrals sent * conversion rate
-            # Let's approximate from data: conversion rate is in referrals table.
-            # Total converted referrals / Total subscribers
-            mean_conv = df_refs['conversion_rate'].mean() if not df_refs.empty else 0.25
-            mean_viral = df_refs['virality_coefficient'].mean() if not df_refs.empty else 0.12
-            
-            # K-factor = (Total Referrals / Total Subscribers) * conversion rate
-            # In our data, referrals is the table of actual signups. So:
-            k_factor = (total_referrals / total_subs) * mean_conv
-            k_factor = min(0.99, max(0.01, k_factor * 1.5)) # scaled for visualization
-        else:
-            k_factor = 0.0
+
+           # Safe defaults if referrals table is empty
+           mean_conv = 0.25
+           mean_viral = 0.12
+
+           if not df_refs.empty:
+               # Fill NaNs to avoid issues
+               mean_conv = float(
+                   df_refs['conversion_rate']
+                   .fillna(0.25)
+                   .mean()
+               )
+
+               mean_viral = float(
+                   df_refs['virality_coefficient']
+                   .fillna(0.12)
+                   .mean()
+               )
+
+               # K-factor formula:
+               # (referrals per subscriber) × conversion rate × viral coefficient
+               k_factor = (
+                   (total_referrals / total_subs)
+                    * mean_conv
+                    * mean_viral
+              )
+
+               # Clamp for visualization safety
+               k_factor = round(
+                   min(0.99, max(0.01, k_factor * 1.5)),
+                   4
+          )
+
+           else:
+               k_factor = 0.0
             
         # Top 5 referrers and sources for graph representation
         nodes = []
@@ -445,14 +473,41 @@ class AnalyticsService:
                 "avg_cpm": round(avg_cpm, 2) if avg_cpm > 0 else (45.0 if category == 'All' else 40.0),
                 "revenue_per_subscriber": round(rev_per_sub, 4)
             })
-            
+
+        forecast = []
+        if len(history) >= 2:
+            last_rev = history[-1]["total_revenue"]
+            prev_rev = history[-2]["total_revenue"]
+            growth_rate = (
+                (last_rev - prev_rev) / prev_rev
+                if prev_rev > 0 else 0.0
+            )
+        elif len(history) == 1:
+            last_rev = history[-1]["total_revenue"]
+            growth_rate = 0.0
+        else:
+            last_rev = 0.0
+            growth_rate = 0.0
+
+        future_months = ["2026-06", "2026-07", "2026-08"]
+        projected = last_rev
+
+        for month in future_months:
+            projected *= (1 + growth_rate)
+            forecast.append({
+                "month": month,
+                "projected_revenue": round(projected, 2)
+            })
+
         # Insights
         spon_yield_insight = "Sponsorship yield outperforms segment benchmark by 24%, driven by strong ad inventory fill and premium open rates."
         premium_growth_insight = "Premium subscribers represent 7.2% of the audience, accounting for recurring baseline stability."
         overall_rev_insight = "Total monthly distribution revenue has compounded at 14% MoM, demonstrating strong monetization leverage."
         
+        
         return {
             "history": history,
+            "forecast": forecast,
             "sponsorship_yield_insight": spon_yield_insight,
             "premium_growth_insight": premium_growth_insight,
             "overall_rev_insight": overall_rev_insight
@@ -700,5 +755,35 @@ class AnalyticsService:
                 
         select_query = f"SELECT * FROM subscribers {sub_where} ORDER BY subscriber_id ASC"
         return db_manager.execute_query(select_query, sub_params)
+    
+    def export_dashboard_metrics(self,
+                                 category=None,
+                                 source=None,
+                                 cohort_period=None,
+                                 revenue_range=None,
+                                 referral_segment=None,
+                                 open_rate_threshold=None):
+        dashboard = self.get_dashboard_data(
+            category=category,
+            source=source,
+            cohort_period=cohort_period,
+            revenue_range=revenue_range,
+            referral_segment=referral_segment,
+            open_rate_threshold=open_rate_threshold
+        )
+
+        export_data = {
+            "metrics": dashboard["metrics"],
+            "benchmarks": dashboard["benchmarks"],
+            "monetization": dashboard["monetization"],
+            "funnel": dashboard["funnel"],
+            "referral": {
+                "k_factor": dashboard["referral"]["virality_coefficient"],
+                "total_referrals": dashboard["referral"]["total_referrals"]
+            }
+        }
+
+        return export_data
+
 
 analytics_service = AnalyticsService()
