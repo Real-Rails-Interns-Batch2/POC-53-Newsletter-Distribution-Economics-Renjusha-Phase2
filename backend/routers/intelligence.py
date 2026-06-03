@@ -58,7 +58,7 @@ def export_data(
     revenue_range: Optional[str] = Query('All'),
     referral_segment: Optional[str] = Query('All'),
     open_rate_threshold: Optional[float] = Query(None),
-    format: str = Query('csv', regex='^(csv|json)$')
+    format: str = Query("csv", pattern='^(csv|json)$')
 ):
     df = analytics_service.export_subscribers(
         category=category,

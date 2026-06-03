@@ -685,7 +685,9 @@ class AnalyticsService:
                 sub_clauses.append("premium_subscription_revenue > 50")
             
             if sub_where:
-                sub_where = "WHERE " + " AND ".join(sub_clauses[0].replace("WHERE ", "") + [sub_clauses[1]])
+                conditions = [sub_where.replace("WHERE ", "")]
+                conditions.extend(sub_clauses[1:])
+                sub_where = "WHERE " + " AND ".join(conditions)
             else:
                 sub_where = "WHERE " + " AND ".join(sub_clauses)
                 
@@ -749,7 +751,11 @@ class AnalyticsService:
                 sub_clauses.append("premium_subscription_revenue > 50")
             
             if sub_where:
-                sub_where = "WHERE " + " AND ".join(sub_clauses[0].replace("WHERE ", "") + [sub_clauses[1]])
+                conditions = [
+                    sub_where.replace("WHERE ", "")
+                ]
+                conditions.extend(sub_clauses[1:])
+                sub_where = "WHERE " + " AND ".join(conditions)
             else:
                 sub_where = "WHERE " + " AND ".join(sub_clauses)
                 

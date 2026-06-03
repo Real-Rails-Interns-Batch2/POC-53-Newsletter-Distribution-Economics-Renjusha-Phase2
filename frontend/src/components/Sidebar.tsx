@@ -14,16 +14,18 @@ import {
   KeyRound,
   TrendingUp,
   FileSpreadsheet,
-  FileCode
+  FileCode,
+  X
 } from 'lucide-react';
 
 interface SidebarProps {
   metrics: HighLevelMetrics | null;
   filters: Filters;
   onFilterChange: (newFilters: Filters) => void;
+  onClose?: () => void;
 }
 
-export default function Sidebar({ metrics, filters, onFilterChange }: SidebarProps) {
+export default function Sidebar({ metrics, filters, onFilterChange, onClose }: SidebarProps) {
   // Available filter options matching generator
   const categories = ['All', 'Tech', 'Fintech', 'AI/Data', 'Growth/Marketing'];
   const sources = [
@@ -69,6 +71,22 @@ export default function Sidebar({ metrics, filters, onFilterChange }: SidebarPro
 
   return (
     <aside className="w-full flex flex-col gap-6 font-sans">
+      
+      {/* Dynamic Slide-over controls header */}
+      {onClose && (
+        <div className="flex justify-between items-center bg-surface-card border border-border-dark p-3.5 rounded-lg shadow-lg">
+          <span className="text-[10px] font-mono tracking-widest text-gray-400 uppercase font-bold">
+            [ Intelligence Controls ]
+          </span>
+          <button 
+            onClick={onClose}
+            className="p-1 px-2.5 rounded border border-border-dark hover:border-accent-cyan/50 hover:bg-accent-cyan/15 text-gray-400 hover:text-accent-cyan transition font-mono text-[10px] flex items-center gap-1.5 cursor-pointer font-bold"
+          >
+            CLOSE
+            <X className="h-3 w-3" />
+          </button>
+        </div>
+      )}
       
       {/* SECTION A: Title + High-Level Metrics */}
       <div className="rounded-lg border border-border-dark bg-surface-card p-5 shadow-xl relative overflow-hidden">

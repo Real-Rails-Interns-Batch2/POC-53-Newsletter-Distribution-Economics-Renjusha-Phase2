@@ -10,6 +10,7 @@ interface SubscriberTableProps {
   page: number;
   pageSize: number;
   onPageChange: (newPage: number) => void;
+  onRowClick?: (subscriberId: string) => void;
 }
 
 export default function SubscriberTable({
@@ -17,7 +18,8 @@ export default function SubscriberTable({
   totalCount,
   page,
   pageSize,
-  onPageChange
+  onPageChange,
+  onRowClick
 }: SubscriberTableProps) {
   const totalPages = Math.ceil(totalCount / pageSize);
 
@@ -69,7 +71,11 @@ export default function SubscriberTable({
               </tr>
             ) : (
               subscribers.map((sub) => (
-                <tr key={sub.subscriber_id} className="hover:bg-background-obsidian/40 transition-colors">
+                <tr 
+                  key={sub.subscriber_id} 
+                  onClick={() => onRowClick?.(sub.subscriber_id)}
+                  className="hover:bg-background-obsidian/50 transition-colors cursor-pointer"
+                >
                   <td className="py-2.5 px-4 text-gray-400 text-[10px] font-semibold">{sub.subscriber_id}</td>
                   <td className="py-2.5 px-3 font-semibold text-gray-200">{sub.email}</td>
                   <td className="py-2.5 px-3 text-gray-400 text-[10px] uppercase tracking-tight">{sub.acquisition_source}</td>

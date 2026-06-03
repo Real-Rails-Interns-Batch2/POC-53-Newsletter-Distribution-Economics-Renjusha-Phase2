@@ -1,22 +1,22 @@
 @import "tailwindcss";
 
 @theme {
-  --color-background-obsidian: #030712;
-  --color-surface-card: #0B1117;
-  --color-accent-cyan: #38BDF8;
+  --color-background-obsidian: #080616;
+  --color-surface-card: #0F0D22;
+  --color-accent-cyan: #A855F7;
   --color-accent-indigo: #818CF8;
-  --color-border-dark: #1F2937;
+  --color-border-dark: #2A2440;
   
   --font-sans: "Inter", "Geist Sans", system-ui, -apple-system, sans-serif;
   --font-display: "Outfit", "Geist Sans", sans-serif;
 }
 
 :root {
-  --background: #030712;
+  --background: #080616;
   --foreground: #F3F4F6;
-  --card: #0B1117;
-  --border: #1F2937;
-  --accent-cyan: #38BDF8;
+  --card: #0F0D22;
+  --border: #2A2440;
+  --accent-cyan: #A855F7;
   --accent-indigo: #818CF8;
 }
 
@@ -35,32 +35,32 @@ body {
 }
 
 ::-webkit-scrollbar-track {
-  background: #030712;
+  background: #080616;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #1F2937;
+  background: #2A2440;
   border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #38BDF8;
+  background: #A855F7;
 }
 
 /* Glassmorphism utility */
 .glass-panel {
-  background: rgba(11, 17, 23, 0.7);
+  background: rgba(15, 13, 34, 0.7);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(31, 41, 55, 0.6);
+  border: 1px solid rgba(42, 36, 64, 0.6);
 }
 
 .glass-panel-glow {
-  background: rgba(11, 17, 23, 0.85);
+  background: rgba(15, 13, 34, 0.85);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(56, 189, 248, 0.3);
-  box-shadow: 0 0 10px 0px rgba(56, 189, 248, 0.15);
+  border: 1px solid rgba(168, 85, 247, 0.3);
+  box-shadow: 0 0 10px 0px rgba(168, 85, 247, 0.15);
 }
 
 /* Custom interactive element glow */
@@ -68,24 +68,24 @@ body {
 .interactive-glow:active,
 .interactive-glow.active {
   outline: none;
-  border-color: #38BDF8;
-  box-shadow: 0 0 8px 0px rgba(56, 189, 248, 0.5);
+  border-color: #A855F7;
+  box-shadow: 0 0 8px 0px rgba(168, 85, 247, 0.5);
   transition: all 0.2s ease-in-out;
 }
 
 .hover-glow:hover {
-  border-color: rgba(56, 189, 248, 0.5);
-  box-shadow: 0 0 6px 0px rgba(56, 189, 248, 0.2);
+  border-color: rgba(168, 85, 247, 0.5);
+  box-shadow: 0 0 6px 0px rgba(168, 85, 247, 0.2);
   transition: all 0.2s ease-in-out;
 }
 
 /* Custom utility animations */
 @keyframes pulseGlow {
   0%, 100% {
-    box-shadow: 0 0 8px 0px rgba(56, 189, 248, 0.15);
+    box-shadow: 0 0 8px 0px rgba(168, 85, 247, 0.15);
   }
   50% {
-    box-shadow: 0 0 16px 2px rgba(56, 189, 248, 0.3);
+    box-shadow: 0 0 16px 2px rgba(168, 85, 247, 0.3);
   }
 }
 

@@ -11,10 +11,12 @@ import {
 
 interface CohortDashboardProps {
   cohorts: CohortRetentionRow[];
+  onRowClick?: (cohortMonth: string) => void;
 }
 
 export default function CohortDashboard({
-  cohorts
+  cohorts,
+  onRowClick
 }: CohortDashboardProps) {
 
   if (!cohorts || cohorts.length === 0) {
@@ -33,13 +35,13 @@ export default function CohortDashboard({
 
   // Heatmap coloring
   const getHeatmapColor = (rate: number) => {
-    if (rate === 1.0) return 'rgba(56, 189, 248, 0.25)';
-    if (rate > 0.8) return 'rgba(56, 189, 248, 0.8)';
-    if (rate > 0.6) return 'rgba(56, 189, 248, 0.6)';
+    if (rate === 1.0) return 'rgba(168, 85, 247, 0.25)';
+    if (rate > 0.8) return 'rgba(168, 85, 247, 0.8)';
+    if (rate > 0.6) return 'rgba(168, 85, 247, 0.6)';
     if (rate > 0.4) return 'rgba(129, 140, 248, 0.5)';
     if (rate > 0.2) return 'rgba(129, 140, 248, 0.3)';
-    if (rate > 0.05) return 'rgba(31, 41, 55, 0.5)';
-    return 'rgba(17, 24, 39, 0.4)';
+    if (rate > 0.05) return 'rgba(42, 36, 64, 0.5)';
+    return 'rgba(15, 13, 34, 0.4)';
   };
 
   // KPI calculations
@@ -180,7 +182,8 @@ export default function CohortDashboard({
             {cohorts.map((row) => (
               <tr
                 key={row.cohort_month}
-                className="hover:bg-background-obsidian/30 transition-colors"
+                onClick={() => onRowClick?.(row.cohort_month)}
+                className="hover:bg-background-obsidian/50 transition-colors cursor-pointer"
               >
                 <td className="py-2.5 px-4 font-semibold text-gray-200">
                   {row.cohort_month}

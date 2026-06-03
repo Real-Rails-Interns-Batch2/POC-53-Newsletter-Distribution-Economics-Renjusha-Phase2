@@ -20,7 +20,10 @@ import {
   ListFilter, 
   Wifi, 
   WifiOff, 
-  AlertTriangle 
+  AlertTriangle,
+  SlidersHorizontal,
+  Info,
+  X
 } from 'lucide-react';
 
 export default function Dashboard() {
@@ -42,6 +45,10 @@ export default function Dashboard() {
   const [isLoading, setIsLoading] = useState(true);
   const [isBackendConnected, setIsBackendConnected] = useState(true);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
+
+  // Slide-over & Metadata Modal States
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [isInfoModalOpen, setIsInfoModalOpen] = useState(false);
 
   // 2. Load Data from API
   const loadDashboardData = useCallback(async (currentFilters: Filters) => {
@@ -217,9 +224,9 @@ export default function Dashboard() {
   };
 
   return (
-    <main className="min-h-screen bg-background-obsidian text-gray-100 flex flex-col">
+    <main className="relative h-screen w-screen overflow-hidden bg-background-obsidian text-gray-100 flex flex-col">
       {/* Header Console */}
-      <header className="border-b border-border-dark bg-surface-card/60 backdrop-blur-md px-6 py-4 flex items-center justify-between sticky top-0 z-30">
+      <header className="sticky top-0 z-30 flex items-center justify-between px-6 py-3 bg-black/10 backdrop-blur-xl border-b border-white/5">
         <div className="flex items-center gap-3">
           <div className="p-2 bg-accent-cyan/15 rounded border border-accent-cyan/20">
             <Terminal className="h-5 w-5 text-accent-cyan" />
@@ -234,65 +241,83 @@ export default function Dashboard() {
           </div>
         </div>
 
-        {/* Status indicator + Export */}
-<div className="flex items-center gap-4">
+        {/* Status indicator + Controls + Export + Signature */}
+        <div className="flex items-center gap-3 sm:gap-4">
+          {/* Controls Trigger Button */}
+          <button
+            onClick={() => setIsSidebarOpen(true)}
+            className="px-3.5 py-2 rounded border border-accent-cyan/25 bg-accent-cyan/10 text-accent-cyan text-xs font-mono hover:bg-accent-cyan/20 transition flex items-center gap-2 cursor-pointer font-bold"
+            title="Open Intelligence Controls"
+          >
+            <SlidersHorizontal className="h-3.5 w-3.5" />
+            <span className="hidden sm:inline">CONTROLS</span>
+          </button>
 
-  {/* Export Metrics Button */}
-  <button
-    onClick={async () => {
-      try {
-        const data = await exportMetrics(filters);
+          {/* Export Metrics Button */}
+          <button
+            onClick={async () => {
+              try {
+                const data = await exportMetrics(filters);
 
-        const blob = new Blob(
-          [JSON.stringify(data, null, 2)],
-          { type: 'application/json' }
-        );
+                const blob = new Blob(
+                  [JSON.stringify(data, null, 2)],
+                  { type: 'application/json' }
+                );
 
-        const url =
-          window.URL.createObjectURL(blob);
+                const url =
+                  window.URL.createObjectURL(blob);
 
-        const a =
-          document.createElement('a');
+                const a =
+                  document.createElement('a');
 
-        a.href = url;
-        a.download =
-          'newsletter_metrics.json';
+                a.href = url;
+                a.download =
+                  'newsletter_metrics.json';
 
-        a.click();
+                a.click();
 
-        window.URL.revokeObjectURL(url);
-      } catch (error) {
-        console.error(
-          'Failed to export metrics',
-          error
-        );
-      }
-    }}
-    className="px-4 py-2 rounded border border-accent-cyan/25 bg-accent-cyan/10 text-accent-cyan text-xs font-mono hover:bg-accent-cyan/20 transition"
-  >
-    EXPORT METRICS
-  </button>
+                window.URL.revokeObjectURL(url);
+              } catch (error) {
+                console.error(
+                  'Failed to export metrics',
+                  error
+                );
+              }
+            }}
+            className="px-3.5 py-2 rounded border border-border-dark bg-[#0F0D22] hover:bg-[#2A2440] text-gray-300 hover:text-white text-xs font-mono transition cursor-pointer font-bold"
+          >
+            EXPORT METRICS
+          </button>
 
-  {/* Backend Status */}
-  <div className="flex items-center gap-1.5 px-3 py-1 rounded bg-background-obsidian border border-border-dark text-[10px] font-mono">
-    {isBackendConnected ? (
-      <>
-        <Wifi className="h-3.5 w-3.5 text-accent-cyan" />
-        <span className="text-accent-cyan font-bold uppercase">
-          UVICORN CONNECTED
-        </span>
-      </>
-    ) : (
-      <>
-        <WifiOff className="h-3.5 w-3.5 text-orange-400 animate-pulse" />
-        <span className="text-orange-400 font-bold uppercase">
-          OFFLINE FAILOVER
-        </span>
-      </>
-    )}
-  </div>
-</div>
-</header>
+          {/* Backend Status */}
+          <div className="hidden md:flex items-center gap-1.5 px-3 py-1.5 rounded bg-background-obsidian border border-border-dark text-[10px] font-mono">
+            {isBackendConnected ? (
+              <>
+                <Wifi className="h-3.5 w-3.5 text-accent-cyan" />
+                <span className="text-accent-cyan font-bold uppercase">
+                  UVICORN CONNECTED
+                </span>
+              </>
+            ) : (
+              <>
+                <WifiOff className="h-3.5 w-3.5 text-orange-400 animate-pulse" />
+                <span className="text-orange-400 font-bold uppercase">
+                  OFFLINE FAILOVER
+                </span>
+              </>
+            )}
+          </div>
+
+          {/* Sleek developer signature (i) trigger */}
+          <button
+             onClick={() => setIsInfoModalOpen(true)}
+             className="p-2 rounded border border-border-dark bg-[#0F0D22]/60 hover:bg-accent-cyan/15 text-gray-400 hover:text-accent-cyan hover:border-accent-cyan/25 transition cursor-pointer"
+             title="Lead Architect Signature"
+          >
+             <Info className="h-4 w-4" />
+          </button>
+        </div>
+      </header>
       
 
       {/* Failover Alert Banner */}
@@ -304,14 +329,16 @@ export default function Dashboard() {
         </div>
       )}
 
-      {/* Main Split-Grid (70/30) */}
-      <div className="flex-1 w-full max-w-[1600px] mx-auto p-6 grid grid-cols-1 lg:grid-cols-10 gap-6">
-        
-        {/* LEFT SIDE (70% width = 7 columns) */}
-        <div className="lg:col-span-7 flex flex-col gap-6">
+      {/* Main Cinematic Stage */}
+      <main className="relative h-full w-full overflow-hidden">
+
+        <div className="absolute inset-0 overflow-y-auto p-6">
+      
+        {/* Full-width content wrapper */}
+        <div className="w-full flex flex-col gap-6">
           
           {/* Tab Navigation */}
-          <div className="flex items-center gap-1 bg-surface-card border border-border-dark p-1 rounded-lg">
+          <div className="flex flex-wrap items-center gap-1 bg-surface-card border border-border-dark p-1 rounded-lg">
             <button
               onClick={() => setActiveTab('overview')}
               className={`flex items-center gap-2 px-4 py-2 text-xs font-mono font-bold rounded cursor-pointer transition-all duration-200 ${
@@ -359,9 +386,18 @@ export default function Dashboard() {
               <ListFilter className="h-3.5 w-3.5" />
               SUBSCRIBER LEDGER
             </button>
+
+            {/* Quick-open Sidebar helper inside navigation */}
+            <button
+              onClick={() => setIsSidebarOpen(true)}
+              className="ml-auto flex items-center gap-1.5 px-3 py-1.5 text-[10px] font-mono tracking-wider font-bold text-accent-cyan border border-accent-cyan/15 bg-accent-cyan/5 rounded hover:bg-accent-cyan/15 transition cursor-pointer animate-pulse"
+            >
+              <SlidersHorizontal className="h-3 w-3" />
+              OPEN FILTERS
+            </button>
           </div>
 
-          {/* Active Tab Panel */}
+          {/* Active Tab Panel (Takes 100% Full-Screen width) */}
           <div className="flex-1 flex flex-col gap-6">
             
             {activeTab === 'overview' && (
@@ -369,6 +405,7 @@ export default function Dashboard() {
                 {/* Cohort retention table */}
                 <CohortDashboard 
                   cohorts={dashboardData ? dashboardData.cohorts : []} 
+                  onRowClick={() => setIsSidebarOpen(true)}
                 />
                 
                 {/* Funnel analytics dropoffs */}
@@ -387,7 +424,10 @@ export default function Dashboard() {
               <>
                 {/* Force-directed network diagram */}
                 {dashboardData && (
-                  <ReferralFlow data={dashboardData.referral} />
+                  <ReferralFlow 
+                    data={dashboardData.referral} 
+                    onNodeClick={() => setIsSidebarOpen(true)}
+                  />
                 )}
               </>
             )}
@@ -411,6 +451,7 @@ export default function Dashboard() {
                     page={ledgerPage}
                     pageSize={15}
                     onPageChange={(p) => setLedgerPage(p)}
+                    onRowClick={() => setIsSidebarOpen(true)}
                   />
                 )}
               </>
@@ -418,17 +459,83 @@ export default function Dashboard() {
             
           </div>
         </div>
+       </div>
+     </main>
 
-        {/* RIGHT SIDEBAR (30% width = 3 columns) */}
-        <div className="lg:col-span-3 self-start sticky top-24 h-fit">
-          <Sidebar 
-            metrics={dashboardData ? dashboardData.metrics : null}
-            filters={filters}
-            onFilterChange={(newFilters) => setFilters(newFilters)}
-          />
+      {/* Backdrop overlay for slide-over sidebar panel */}
+      {isSidebarOpen && (
+        <div 
+          onClick={() => setIsSidebarOpen(false)}
+          className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 transition-opacity duration-300 cursor-pointer"
+        />
+      )}
+
+      {/* Slide-over Intelligence Panel */}
+      <div 
+        className={`fixed top-0 right-0 h-full w-[420px] max-w-full bg-[#0F0D22]/95 border-l border-accent-cyan/15 z-50 transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] shadow-2xl overflow-hidden backdrop-blur-xl ${
+          isSidebarOpen ? 'translate-x-0 opacity-100' : 'translate-x-full opacity-0 pointer-events-none'
+        }`}
+      >
+        <div className="h-full overflow-y-auto p-6">
+       <Sidebar 
+          metrics={dashboardData ? dashboardData.metrics : null}
+          filters={filters}
+          onFilterChange={(newFilters) => setFilters(newFilters)}
+          onClose={() => setIsSidebarOpen(false)}
+        />
         </div>
-
       </div>
+
+      {/* Developer Signature Popover Modal */}
+      {isInfoModalOpen && (
+        <div className="fixed inset-0 bg-black/75 backdrop-blur-md flex items-center justify-center z-50 p-4">
+          <div className="w-full max-w-md bg-[#0F0D22] border border-accent-cyan/35 glass-panel-glow p-6 rounded-lg relative transition-all duration-200">
+            <button 
+              onClick={() => setIsInfoModalOpen(false)}
+              className="absolute top-4 right-4 text-gray-400 hover:text-accent-cyan p-1.5 rounded-full border border-border-dark hover:border-accent-cyan/25 transition cursor-pointer font-bold"
+            >
+              <X className="h-3.5 w-3.5" />
+            </button>
+            <div className="flex items-center gap-3 border-b border-[#2A2440] pb-4 mb-4">
+              <div className="p-2.5 bg-accent-cyan/10 border border-accent-cyan/20 rounded">
+                <Terminal className="h-5 w-5 text-accent-cyan" />
+              </div>
+              <div>
+                <h3 className="font-display font-bold text-gray-100 text-base">Lead Architect Signature</h3>
+                <p className="text-[9px] text-gray-400 font-mono tracking-widest uppercase mt-0.5">Real Rails Protocol V2</p>
+              </div>
+            </div>
+            <div className="space-y-3.5 font-mono text-xs text-gray-300">
+              <div className="flex justify-between border-b border-[#2A2440]/45 pb-2">
+                <span className="text-gray-400 uppercase tracking-wider text-[9px]">Architect</span>
+                <span className="text-gray-100 font-bold text-right">Renjusha</span>
+              </div>
+              <div className="flex justify-between border-b border-[#2A2440]/45 pb-2">
+                <span className="text-gray-400 uppercase tracking-wider text-[9px]">Batch</span>
+                <span className="text-gray-100 font-bold text-right">Batch 2 Interns</span>
+              </div>
+              <div className="flex justify-between border-b border-[#2A2440]/45 pb-2">
+                <span className="text-gray-400 uppercase tracking-wider text-[9px]">Stack</span>
+                <span className="text-gray-100 font-bold text-right text-xs">
+                  Next.js, FastAPI, Tailwind CSS, Apache ECharts
+                </span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-gray-400 uppercase tracking-wider text-[9px]">Project</span>
+                <span className="text-accent-cyan font-bold text-right">[ID-53] Newsletter Distribution Economics</span>
+              </div>
+            </div>
+            <div className="mt-6 flex justify-end">
+              <button 
+                onClick={() => setIsInfoModalOpen(false)}
+                className="px-4 py-2 rounded border border-accent-cyan/20 bg-accent-cyan/10 hover:bg-accent-cyan/20 text-accent-cyan text-xs font-mono tracking-wider uppercase font-bold cursor-pointer transition-all duration-150"
+              >
+                Acknowledge Signature
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Footer System Meta */}
       <footer className="border-t border-border-dark/50 bg-surface-card/30 px-6 py-3 flex items-center justify-between text-[10px] text-gray-500 font-mono">

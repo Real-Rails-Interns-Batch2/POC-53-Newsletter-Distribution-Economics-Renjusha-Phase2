@@ -61,8 +61,8 @@ export default function MonetizationOverview({ data }: MonetizationOverviewProps
             color: '#4B5563'
           }
         },
-        backgroundColor: '#0B1117',
-        borderColor: '#1F2937',
+        backgroundColor: '#0F0D22',
+        borderColor: '#2A2440',
         borderWidth: 1,
         textStyle: {
           color: '#F3F4F6',
@@ -155,8 +155,8 @@ export default function MonetizationOverview({ data }: MonetizationOverviewProps
           data: sponRev,
           itemStyle: {
             color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
-              { offset: 0, color: '#38BDF8' },
-              { offset: 1, color: 'rgba(56, 189, 248, 0.4)' }
+              { offset: 0, color: '#A855F7' },
+              { offset: 1, color: 'rgba(168, 85, 247, 0.4)' }
             ])
           }
         },

@@ -14,10 +14,12 @@ import {
 
 interface ReferralFlowProps {
   data: ReferralFlywheelData;
+  onNodeClick?: (nodeId: string) => void;
 }
 
 export default function ReferralFlow({
-  data
+  data,
+  onNodeClick
 }: ReferralFlowProps) {
 
   const chartRef = useRef<HTMLDivElement>(null);
@@ -77,10 +79,10 @@ export default function ReferralFlow({
 
     chartInstance.current = myChart;
 
-    const echartsNodes: echarts.GraphNodeItemOption[] =
+    const echartsNodes: any[] =
       data.nodes.map((n) => {
 
-        let color = '#38BDF8';
+        let color = '#A855F7';
 
         if (n.type === 'influencer')
           color = '#818CF8';
@@ -97,7 +99,7 @@ export default function ReferralFlow({
           itemStyle: {
             color,
             borderColor:
-              'rgba(56,189,248,0.4)',
+              'rgba(168,85,247,0.4)',
             borderWidth:
               n.id === 'Audience Core'
                 ? 3
@@ -153,8 +155,8 @@ export default function ReferralFlow({
       {
         tooltip: {
           trigger: 'item',
-          backgroundColor: '#0B1117',
-          borderColor: '#1F2937',
+          backgroundColor: '#0F0D22',
+          borderColor: '#2A2440',
           borderWidth: 1,
           textStyle: {
             color: '#F3F4F6',
@@ -183,7 +185,7 @@ export default function ReferralFlow({
               focus: 'adjacency',
               lineStyle: {
                 width: 5,
-                color: '#38BDF8'
+                color: '#A855F7'
               }
             }
           }
@@ -191,6 +193,15 @@ export default function ReferralFlow({
       };
 
     myChart.setOption(option);
+
+    // Register node selection click listener to trigger slide-over
+    myChart.on('click', (params: any) => {
+      if (params.dataType === 'node') {
+        if (onNodeClick) {
+          onNodeClick(params.data.id);
+        }
+      }
+    });
 
     const resize = () =>
       myChart.resize();
@@ -207,7 +218,7 @@ export default function ReferralFlow({
       );
     };
 
-  }, [mounted, data]);
+  }, [mounted, data, onNodeClick]);
 
   return (
     <div className="rounded-lg border border-border-dark bg-surface-card p-6 shadow-xl flex flex-col h-[650px]">
