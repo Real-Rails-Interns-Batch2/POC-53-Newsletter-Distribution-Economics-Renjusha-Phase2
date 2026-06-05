@@ -233,7 +233,7 @@ export default function Dashboard() {
           </div>
           <div className="flex flex-col">
   {/* Title Row */}
-  <div className="flex items-center gap-3 flex-wrap">
+  <div className="flex items-center gap-5 flex-wrap">
     <h1 className="font-display text-lg font-bold tracking-tight text-gray-100">
       Newsletter Distribution Economics
     </h1>
