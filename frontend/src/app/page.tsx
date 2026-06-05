@@ -231,14 +231,29 @@ export default function Dashboard() {
           <div className="p-2 bg-accent-cyan/15 rounded border border-accent-cyan/20">
             <Terminal className="h-5 w-5 text-accent-cyan" />
           </div>
-          <div>
-            <h1 className="font-display text-lg font-bold tracking-tight text-gray-100">
-              Newsletter Distribution Economics
-            </h1>
-            <p className="text-[10px] text-gray-400 font-mono tracking-widest uppercase mt-0.5">
-              Project ID: 53 // Rail: Distribution & Demand
-            </p>
-          </div>
+          <div className="flex flex-col">
+  {/* Title Row */}
+  <div className="flex items-center gap-3 flex-wrap">
+    <h1 className="font-display text-lg font-bold tracking-tight text-gray-100">
+      Newsletter Distribution Economics
+    </h1>
+
+    {/* Internship Badge */}
+    <div className="relative overflow-hidden px-3 py-1 rounded-md border border-accent-cyan/25 bg-gradient-to-r from-accent-cyan/10 via-[#131125] to-accent-cyan/10 shadow-[0_0_20px_rgba(0,255,255,0.08)]">
+      {/* subtle glow overlay */}
+      <div className="absolute inset-0 bg-accent-cyan/5 blur-xl opacity-50" />
+
+      <span className="relative text-[10px] sm:text-[11px] font-mono tracking-[0.22em] uppercase font-bold text-accent-cyan">
+        INFOCREON INTERNSHIP
+      </span>
+    </div>
+  </div>
+
+  {/* Project metadata */}
+  <p className="text-[10px] text-gray-400 font-mono tracking-widest uppercase mt-1">
+    Project ID: 53 // Rail: Distribution & Demand
+  </p>
+</div>
         </div>
 
         {/* Status indicator + Controls + Export + Signature */}
